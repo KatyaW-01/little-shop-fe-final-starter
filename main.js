@@ -246,7 +246,7 @@ function displayMerchantItems(event) {
 function getMerchantCoupons(event) { // should fetch the coupon data for each merchant 
   let merchantId = event.target.closest("article").id.split('-')[1]
   console.log("Merchant ID:", merchantId)
-
+  activeCoupons.dataset.merchantId = merchantId //stores the merchantId in the button's data tag
   fetchData(`merchants/${merchantId}/coupons`)
   .then(couponData => {
     console.log("Coupon data from fetch:", couponData)
@@ -257,8 +257,9 @@ function getMerchantCoupons(event) { // should fetch the coupon data for each me
 }
 
 function getActiveMerchantCoupons(event){
-  let merchantId = event.target.closest("article").id.split('-')[1]
+  let merchantId = event.target.dataset.merchantId //uses the id stored in the data tag
   console.log("Merchant ID:", merchantId)
+
   fetchData(`merchants/${merchantId}/coupons?status=active`)
   .then(couponData => {
     console.log("Coupon data from fetch:", couponData)
@@ -288,7 +289,7 @@ function displayMerchantCoupons(coupons,event) {
 function displayActiveMerchantCoupons(allActiveCoupons,event){
   show([couponsView,activeCoupons]) 
   hide([merchantsView, itemsView, addNewButton])
-  let merchantId = event.target.closest("article").id.split('-')[1]
+  let merchantId = event.target.dataset.merchantId
   showingText.innerText = `All active coupons for Merchant #${merchantId}`
   couponsView.innerHTML = ''
   allActiveCoupons.forEach(coupon => {
