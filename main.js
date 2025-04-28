@@ -10,7 +10,7 @@ const merchantsNavButton = document.querySelector("#merchants-nav")
 const itemsNavButton = document.querySelector("#items-nav")
 const addNewButton = document.querySelector("#add-new-button")
 const showingText = document.querySelector("#showing-text")
-const merchantCouponsButton = document.querySelector("#view-merchant-coupons")
+
 
 //Form elements
 const merchantForm = document.querySelector("#new-merchant-form")
@@ -33,8 +33,6 @@ addNewButton.addEventListener('click', () => {
 submitMerchantButton.addEventListener('click', (event) => {
   submitMerchant(event)
 })
-
-merchantCouponsButton.addEventListener('click',showMerchantCouponsView)
 
 //Global variables
 let merchants;
@@ -234,19 +232,6 @@ function displayAddedMerchant(merchant) {
         </article>`)
 }
 
-function displayMerchantCoupons(coupons){
-  couponsView.innerHTML = ''
-  coupons.forEach(coupon => {
-    couponsView.innerHTML += 
-    `<article class="coupon" id="coupon-${coupon.id}">
-    <h3 class="coupon-name">${coupon.attributes.name}</h3>
-    <h3 class="coupon-code">${coupon.attributes.code}</h3>
-    <h3 class="coupon-value">${coupon.attributes.value}</h3>
-    <h3 class="coupon-value_type">${coupon.attributes.value_type}</h3>
-    <h3 class="coupon-status">${coupon.attributes.activated}</h3>
-    </article>`
-  })
-}
 
 function displayMerchantItems(event) {
   let merchantId = event.target.closest("article").id.split('-')[1]
@@ -270,9 +255,17 @@ function displayMerchantCoupons(coupons) {
   show([couponsView]) //removes classList hidden 
   hide([merchantsView, itemsView]) //add classList hidden
 
-  couponsView.innerHTML = `
-    <p>Coupon data will go here.</p>
-  `//use helper method to get a merchants coupons like filterByMerchant?
+  couponsView.innerHTML = ''
+  coupons.forEach(coupon => {
+    couponsView.innerHTML += 
+    `<article class="coupon" id="coupon-${coupon.id}">
+    <h3 class="coupon-name">${coupon.attributes.name}</h3>
+    <h3 class="coupon-code">${coupon.attributes.code}</h3>
+    <h3 class="coupon-value">${coupon.attributes.value}</h3>
+    <h3 class="coupon-value_type">${coupon.attributes.value_type}</h3>
+    <h3 class="coupon-status">${coupon.attributes.activated}</h3>
+    </article>`
+  })
 }
 
 //Helper Functions
