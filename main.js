@@ -11,6 +11,7 @@ const itemsNavButton = document.querySelector("#items-nav")
 const addNewButton = document.querySelector("#add-new-button")
 const showingText = document.querySelector("#showing-text")
 const activeCoupons = document.querySelector("#view-active-button")
+const backButton = document.querySelector("#back-button")
 
 //Form elements
 const merchantForm = document.querySelector("#new-merchant-form")
@@ -37,6 +38,10 @@ submitMerchantButton.addEventListener('click', (event) => {
 activeCoupons.addEventListener('click', (event)=> {
   handleMerchantClicks(event)
 })
+
+// backButton.addEventListener('click',(event)=>{
+//   getMerchantCoupons(event)
+// })
 
 //Global variables
 let merchants;
@@ -287,8 +292,8 @@ function displayMerchantCoupons(coupons,event) {
 }
 
 function displayActiveMerchantCoupons(allActiveCoupons,event){
-  show([couponsView,activeCoupons]) 
-  hide([merchantsView, itemsView, addNewButton])
+  show([couponsView]) 
+  hide([merchantsView, itemsView, addNewButton,activeCoupons])
   let merchantId = event.target.dataset.merchantId
   showingText.innerText = `All active coupons for Merchant #${merchantId}`
   couponsView.innerHTML = ''
@@ -300,6 +305,7 @@ function displayActiveMerchantCoupons(allActiveCoupons,event){
     <p class="coupon-value">Value: ${coupon.attributes.value} ${coupon.attributes.value_type} off<p>
     </article>`
   })
+  couponsView.innerHTML += `<button id="back-button" class="back-to-coupons">All Coupons</button>`
 }
 
 //Helper Functions
