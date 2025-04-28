@@ -234,6 +234,20 @@ function displayAddedMerchant(merchant) {
         </article>`)
 }
 
+function displayMerchantCoupons(coupons){
+  couponsView.innerHTML = ''
+  coupons.forEach(coupon => {
+    couponsView.innerHTML += 
+    `<article class="coupon" id="coupon-${coupon.id}">
+    <h3 class="coupon-name">${coupon.attributes.name}</h3>
+    <h3 class="coupon-code">${coupon.attributes.code}</h3>
+    <h3 class="coupon-value">${coupon.attributes.value}</h3>
+    <h3 class="coupon-value_type">${coupon.attributes.value_type}</h3>
+    <h3 class="coupon-status">${coupon.attributes.activated}</h3>
+    </article>`
+  })
+}
+
 function displayMerchantItems(event) {
   let merchantId = event.target.closest("article").id.split('-')[1]
   const filteredMerchantItems = filterByMerchant(merchantId)
@@ -273,7 +287,6 @@ function hide(elements) {
     element.classList.add('hidden')
   })
 }
-
 function addRemoveActiveNav(nav1, nav2) {
   nav1.classList.add('active-nav')
   nav2.classList.remove('active-nav')
