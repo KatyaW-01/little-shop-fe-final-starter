@@ -10,6 +10,7 @@ const merchantsNavButton = document.querySelector("#merchants-nav")
 const itemsNavButton = document.querySelector("#items-nav")
 const addNewButton = document.querySelector("#add-new-button")
 const showingText = document.querySelector("#showing-text")
+const merchantCouponsButton = document.querySelector("#view-merchant-coupons")
 
 //Form elements
 const merchantForm = document.querySelector("#new-merchant-form")
@@ -33,12 +34,15 @@ submitMerchantButton.addEventListener('click', (event) => {
   submitMerchant(event)
 })
 
+merchantCouponsButton.addEventListener('click',showMerchantCouponsView)
+
 //Global variables
 let merchants;
 let items;
+let coupons; 
 
 //Page load data fetching
-Promise.all([fetchData('merchants'), fetchData('items')])
+Promise.all([fetchData('merchants'), fetchData('items'), fetchData('coupons')])
 .then(responses => {
     merchants = responses[0].data
     items = responses[1].data
@@ -165,6 +169,10 @@ function showMerchantItemsView(id, items) {
   displayItems(items)
 }
 
+function showMerchantCouponsView(){
+
+}
+
 // Functions that add data to the DOM
 function displayItems(items) {
   itemsView.innerHTML = ''
@@ -232,24 +240,25 @@ function displayMerchantItems(event) {
   showMerchantItemsView(merchantId, filteredMerchantItems)
 }
 
-function getMerchantCoupons(event) {
+function getMerchantCoupons(event) { // should fetch the coupon data for each merchant 
   let merchantId = event.target.closest("article").id.split('-')[1]
   console.log("Merchant ID:", merchantId)
 
-  fetchData(`merchants/${merchantId}`)
+  fetchData(`merchants/${merchantId}/coupons`)
   .then(couponData => {
     console.log("Coupon data from fetch:", couponData)
-    displayMerchantCoupons(couponData);
+    coupons = couponData.data
+    displayMerchantCoupons(coupons);
   })
 }
 
 function displayMerchantCoupons(coupons) {
-  show([couponsView])
-  hide([merchantsView, itemsView])
+  show([couponsView]) //removes classList hidden 
+  hide([merchantsView, itemsView]) //add classList hidden
 
   couponsView.innerHTML = `
     <p>Coupon data will go here.</p>
-  `
+  `//use helper method to get a merchants coupons like filterByMerchant?
 }
 
 //Helper Functions
