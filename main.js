@@ -11,7 +11,6 @@ const itemsNavButton = document.querySelector("#items-nav")
 const addNewButton = document.querySelector("#add-new-button")
 const showingText = document.querySelector("#showing-text")
 
-
 //Form elements
 const merchantForm = document.querySelector("#new-merchant-form")
 const newMerchantName = document.querySelector("#new-merchant-name")
@@ -167,7 +166,6 @@ function showMerchantItemsView(id, items) {
   displayItems(items)
 }
 
-
 // Functions that add data to the DOM
 function displayItems(items) {
   itemsView.innerHTML = ''
@@ -244,17 +242,17 @@ function getMerchantCoupons(event) { // should fetch the coupon data for each me
   .then(couponData => {
     console.log("Coupon data from fetch:", couponData)
     coupons = couponData.data
-    displayMerchantCoupons(coupons);
+    displayMerchantCoupons(coupons,event);
     
   })
 }
 
 function displayMerchantCoupons(coupons,event) {
-  show([couponsView]) //removes classList hidden 
-  hide([merchantsView, itemsView, addNewButton]) //add classList hidden
-  // let merchantId = event.target.closest("article").id.split('-')[1]
-  // showingText.innerText = ''
-  // showingText.innerText = `All coupons for Merchant #${merchantId}`
+  show([couponsView]) 
+  hide([merchantsView, itemsView, addNewButton])
+  let merchantId = event.target.closest("article").id.split('-')[1]
+  showingText.innerText = `All coupons for Merchant #${merchantId}`
+  
 
   couponsView.innerHTML = ''
   coupons.forEach(coupon => {
