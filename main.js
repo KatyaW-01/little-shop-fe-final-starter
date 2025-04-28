@@ -10,6 +10,7 @@ const merchantsNavButton = document.querySelector("#merchants-nav")
 const itemsNavButton = document.querySelector("#items-nav")
 const addNewButton = document.querySelector("#add-new-button")
 const showingText = document.querySelector("#showing-text")
+const activeCoupons = document.querySelector("#view-active-button")
 
 //Form elements
 const merchantForm = document.querySelector("#new-merchant-form")
@@ -33,10 +34,15 @@ submitMerchantButton.addEventListener('click', (event) => {
   submitMerchant(event)
 })
 
+activeCoupons.addEventListener('click', (event)=> {
+  handleMerchantClicks(event)
+})
+
 //Global variables
 let merchants;
 let items;
 let coupons; 
+let allActiveCoupons;
 
 //Page load data fetching
 Promise.all([fetchData('merchants'), fetchData('items'), fetchData('coupons')])
@@ -44,6 +50,7 @@ Promise.all([fetchData('merchants'), fetchData('items'), fetchData('coupons')])
     merchants = responses[0].data
     items = responses[1].data
     displayMerchants(merchants)
+    hide([activeCoupons])
   })
   .catch(err => {
     console.log('catch error: ', err)
@@ -63,6 +70,8 @@ function handleMerchantClicks(event) {
     submitMerchantEdits(event)
   } else if (event.target.classList.contains("discard-merchant-edits")) {
     discardMerchantEdits(event)
+  } else if (event.target.classList.contains("view-active-coupons")){
+    getActiveMerchantCoupons(event)
   }
 }
 
@@ -247,8 +256,19 @@ function getMerchantCoupons(event) { // should fetch the coupon data for each me
   })
 }
 
+function getActiveMerchantCoupons(event){
+  let merchantId = event.target.closest("article").id.split('-')[1]
+  console.log("Merchant ID:", merchantId)
+  fetchData(`merchants/${merchantId}/coupons?status=active`)
+  .then(couponData => {
+    console.log("Coupon data from fetch:", couponData)
+    allActiveCoupons = couponData.data
+    displayActiveMerchantCoupons(allActiveCoupons,event);
+  })
+}
+
 function displayMerchantCoupons(coupons,event) {
-  show([couponsView]) 
+  show([couponsView,activeCoupons]) 
   hide([merchantsView, itemsView, addNewButton])
   let merchantId = event.target.closest("article").id.split('-')[1]
   showingText.innerText = `All coupons for Merchant #${merchantId}`
@@ -261,7 +281,22 @@ function displayMerchantCoupons(coupons,event) {
     <h2 class="coupon-name">${coupon.attributes.name}</h2>
     <p class="coupon-code">${coupon.attributes.code}<p>
     <p class="coupon-value">Value: ${coupon.attributes.value} ${coupon.attributes.value_type} off<p>
-    <p class="coupon-activated">Activated: ${coupon.attributes.activated} <p>
+    </article>`
+  })
+}
+
+function displayActiveMerchantCoupons(allActiveCoupons,event){
+  show([couponsView,activeCoupons]) 
+  hide([merchantsView, itemsView, addNewButton])
+  let merchantId = event.target.closest("article").id.split('-')[1]
+  showingText.innerText = `All active coupons for Merchant #${merchantId}`
+  couponsView.innerHTML = ''
+  allActiveCoupons.forEach(coupon => {
+    couponsView.innerHTML += 
+    `<article class="coupon" id="coupon-${coupon.id}">
+    <h2 class="coupon-name">${coupon.attributes.name}</h2>
+    <p class="coupon-code">${coupon.attributes.code}<p>
+    <p class="coupon-value">Value: ${coupon.attributes.value} ${coupon.attributes.value_type} off<p>
     </article>`
   })
 }
