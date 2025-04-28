@@ -258,11 +258,10 @@ function displayMerchantCoupons(coupons,event) {
   coupons.forEach(coupon => {
     couponsView.innerHTML += 
     `<article class="coupon" id="coupon-${coupon.id}">
-    <h3 class="coupon-name">${coupon.attributes.name}</h3>
-    <h3 class="coupon-code">${coupon.attributes.code}</h3>
-    <h3 class="coupon-value">${coupon.attributes.value}</h3>
-    <h3 class="coupon-value_type">${coupon.attributes.value_type}</h3>
-    <h3 class="coupon-status">${coupon.attributes.activated}</h3>
+    <h2 class="coupon-name">${coupon.attributes.name}</h2>
+    <p class="coupon-code">${coupon.attributes.code}<p>
+    <p class="coupon-value">Value: ${coupon.attributes.value} ${coupon.attributes.value_type} off<p>
+    <p class="coupon-activated">Activated: ${coupon.attributes.activated} <p>
     </article>`
   })
 }

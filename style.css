@@ -155,8 +155,9 @@ h3 {
 #coupons-view {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: space-evenly;
 }
+
 
 .item, .coupon {
   flex-direction: column;
