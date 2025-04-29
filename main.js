@@ -160,7 +160,7 @@ function showMerchantsView() {
   addRemoveActiveNav(merchantsNavButton, itemsNavButton)
   addNewButton.dataset.state = 'merchant'
   show([merchantsView, addNewButton])
-  hide([itemsView])
+  hide([itemsView, backButton,activeCoupons])
   displayMerchants(merchants)
 }
 
@@ -195,8 +195,7 @@ function displayItems(items) {
           <p>${item.attributes.description}</p>
           <p>$${item.attributes.unit_price}</p>
           <p class="merchant-name-in-item">Merchant: ${merchant}</p>
-        </article>
-    `
+        </article>`
   })
 }
 
