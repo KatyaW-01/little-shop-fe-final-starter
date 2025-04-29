@@ -39,9 +39,9 @@ activeCoupons.addEventListener('click', (event)=> {
   handleMerchantClicks(event)
 })
 
-// backButton.addEventListener('click',(event)=>{
-//   getMerchantCoupons(event)
-// })
+backButton.addEventListener('click',(event)=>{ //event listener for back button
+  handleMerchantClicks(event)
+})
 
 //Global variables
 let merchants;
@@ -55,7 +55,7 @@ Promise.all([fetchData('merchants'), fetchData('items'), fetchData('coupons')])
     merchants = responses[0].data
     items = responses[1].data
     displayMerchants(merchants)
-    hide([activeCoupons])
+    hide([activeCoupons,backButton])
   })
   .catch(err => {
     console.log('catch error: ', err)
@@ -77,6 +77,8 @@ function handleMerchantClicks(event) {
     discardMerchantEdits(event)
   } else if (event.target.classList.contains("view-active-coupons")){
     getActiveMerchantCoupons(event)
+  } else if (event.target.classList.contains("back-to-coupons")){
+    backToAllMerchantCoupons(event) //function call for back button
   }
 }
 
@@ -248,7 +250,7 @@ function displayMerchantItems(event) {
   showMerchantItemsView(merchantId, filteredMerchantItems)
 }
 
-function getMerchantCoupons(event) { // should fetch the coupon data for each merchant 
+function getMerchantCoupons(event){ 
   let merchantId = event.target.closest("article").id.split('-')[1]
   console.log("Merchant ID:", merchantId)
   activeCoupons.dataset.merchantId = merchantId //stores the merchantId in the button's data tag
@@ -260,6 +262,17 @@ function getMerchantCoupons(event) { // should fetch the coupon data for each me
     
   })
 }
+
+function backToAllMerchantCoupons(event) { //new function for back button because .closet won't work on display-options 
+  let merchantId = event.target.dataset.merchantId
+  console.log("Merchant ID:", merchantId)
+  fetchData(`merchants/${merchantId}/coupons`)
+  .then(couponData => {
+    console.log("Coupon data from fetch:", couponData)
+    coupons = couponData.data
+    displayMerchantCoupons(coupons,event);
+  })
+  }
 
 function getActiveMerchantCoupons(event){
   let merchantId = event.target.dataset.merchantId //uses the id stored in the data tag
@@ -292,7 +305,7 @@ function displayMerchantCoupons(coupons,event) {
 }
 
 function displayActiveMerchantCoupons(allActiveCoupons,event){
-  show([couponsView]) 
+  show([couponsView,backButton]) 
   hide([merchantsView, itemsView, addNewButton,activeCoupons])
   let merchantId = event.target.dataset.merchantId
   showingText.innerText = `All active coupons for Merchant #${merchantId}`
@@ -305,7 +318,6 @@ function displayActiveMerchantCoupons(allActiveCoupons,event){
     <p class="coupon-value">Value: ${coupon.attributes.value} ${coupon.attributes.value_type} off<p>
     </article>`
   })
-  couponsView.innerHTML += `<button id="back-button" class="back-to-coupons">All Coupons</button>`
 }
 
 //Helper Functions
