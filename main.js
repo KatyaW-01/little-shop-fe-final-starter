@@ -254,6 +254,7 @@ function getMerchantCoupons(event){
   let merchantId = event.target.closest("article").id.split('-')[1]
   console.log("Merchant ID:", merchantId)
   activeCoupons.dataset.merchantId = merchantId //stores the merchantId in the button's data tag
+  backButton.dataset.merchantId = merchantId
   fetchData(`merchants/${merchantId}/coupons`)
   .then(couponData => {
     console.log("Coupon data from fetch:", couponData)
@@ -264,14 +265,31 @@ function getMerchantCoupons(event){
 }
 
 function backToAllMerchantCoupons(event) { //new function for back button because .closet won't work on display-options 
-  let merchantId = event.target.dataset.merchantId
+  let merchantId = event.target.dataset.merchantId 
   console.log("Merchant ID:", merchantId)
   fetchData(`merchants/${merchantId}/coupons`)
   .then(couponData => {
     console.log("Coupon data from fetch:", couponData)
     coupons = couponData.data
-    displayMerchantCoupons(coupons,event);
+    displayAllMerchantCoupons(coupons,event);
   })
+  }
+
+  function displayAllMerchantCoupons(coupons,event){
+    show([couponsView,activeCoupons]) 
+    hide([merchantsView, itemsView, addNewButton,backButton])
+    let merchantId = event.target.dataset.merchantId
+    console.log("Merchant ID:", merchantId)
+    showingText.innerText = `All coupons for Merchant #${merchantId}`
+    couponsView.innerHTML = ''
+    coupons.forEach(coupon => {
+      couponsView.innerHTML += 
+      `<article class="coupon" id="coupon-${coupon.id}">
+      <h2 class="coupon-name">${coupon.attributes.name}</h2>
+      <p class="coupon-code">${coupon.attributes.code}<p>
+      <p class="coupon-value">Value: ${coupon.attributes.value} ${coupon.attributes.value_type} off<p>
+      </article>`
+    })
   }
 
 function getActiveMerchantCoupons(event){
