@@ -10,6 +10,8 @@ const merchantsNavButton = document.querySelector("#merchants-nav")
 const itemsNavButton = document.querySelector("#items-nav")
 const addNewButton = document.querySelector("#add-new-button")
 const showingText = document.querySelector("#showing-text")
+const activeCoupons = document.querySelector("#view-active-button")
+const backButton = document.querySelector("#back-button")
 
 //Form elements
 const merchantForm = document.querySelector("#new-merchant-form")
@@ -33,10 +35,19 @@ submitMerchantButton.addEventListener('click', (event) => {
   submitMerchant(event)
 })
 
+activeCoupons.addEventListener('click', (event)=> {
+  handleMerchantClicks(event)
+})
+
+backButton.addEventListener('click',(event)=>{ 
+  handleMerchantClicks(event)
+})
+
 //Global variables
 let merchants;
 let items;
 let coupons; 
+let allActiveCoupons;
 
 //Page load data fetching
 Promise.all([fetchData('merchants'), fetchData('items'), fetchData('coupons')])
@@ -44,6 +55,7 @@ Promise.all([fetchData('merchants'), fetchData('items'), fetchData('coupons')])
     merchants = responses[0].data
     items = responses[1].data
     displayMerchants(merchants)
+    hide([activeCoupons,backButton])
   })
   .catch(err => {
     console.log('catch error: ', err)
@@ -63,6 +75,10 @@ function handleMerchantClicks(event) {
     submitMerchantEdits(event)
   } else if (event.target.classList.contains("discard-merchant-edits")) {
     discardMerchantEdits(event)
+  } else if (event.target.classList.contains("view-active-coupons")){
+    getActiveMerchantCoupons(event)
+  } else if (event.target.classList.contains("back-to-coupons")){
+    backToAllMerchantCoupons(event) 
   }
 }
 
@@ -144,7 +160,7 @@ function showMerchantsView() {
   addRemoveActiveNav(merchantsNavButton, itemsNavButton)
   addNewButton.dataset.state = 'merchant'
   show([merchantsView, addNewButton])
-  hide([itemsView])
+  hide([itemsView, backButton,activeCoupons])
   displayMerchants(merchants)
 }
 
@@ -179,8 +195,7 @@ function displayItems(items) {
           <p>${item.attributes.description}</p>
           <p>$${item.attributes.unit_price}</p>
           <p class="merchant-name-in-item">Merchant: ${merchant}</p>
-        </article>
-    `
+        </article>`
   })
 }
 
@@ -227,17 +242,17 @@ function displayAddedMerchant(merchant) {
         </article>`)
 }
 
-
 function displayMerchantItems(event) {
   let merchantId = event.target.closest("article").id.split('-')[1]
   const filteredMerchantItems = filterByMerchant(merchantId)
   showMerchantItemsView(merchantId, filteredMerchantItems)
 }
 
-function getMerchantCoupons(event) { // should fetch the coupon data for each merchant 
+function getMerchantCoupons(event){ 
   let merchantId = event.target.closest("article").id.split('-')[1]
   console.log("Merchant ID:", merchantId)
-
+  activeCoupons.dataset.merchantId = merchantId
+  backButton.dataset.merchantId = merchantId
   fetchData(`merchants/${merchantId}/coupons`)
   .then(couponData => {
     console.log("Coupon data from fetch:", couponData)
@@ -247,13 +262,23 @@ function getMerchantCoupons(event) { // should fetch the coupon data for each me
   })
 }
 
-function displayMerchantCoupons(coupons,event) {
-  show([couponsView]) 
-  hide([merchantsView, itemsView, addNewButton])
-  let merchantId = event.target.closest("article").id.split('-')[1]
-  showingText.innerText = `All coupons for Merchant #${merchantId}`
-  
+function backToAllMerchantCoupons(event) { 
+  let merchantId = event.target.dataset.merchantId 
+  console.log("Merchant ID:", merchantId)
+  fetchData(`merchants/${merchantId}/coupons`)
+  .then(couponData => {
+    console.log("Coupon data from fetch:", couponData)
+    coupons = couponData.data
+    displayAllMerchantCoupons(coupons,event);
+  })
+}
 
+function displayAllMerchantCoupons(coupons,event){
+  show([couponsView,activeCoupons]) 
+  hide([merchantsView, itemsView, addNewButton,backButton])
+  let merchantId = event.target.dataset.merchantId
+  console.log("Merchant ID:", merchantId)
+  showingText.innerText = `All coupons for Merchant #${merchantId}`
   couponsView.innerHTML = ''
   coupons.forEach(coupon => {
     couponsView.innerHTML += 
@@ -261,7 +286,49 @@ function displayMerchantCoupons(coupons,event) {
     <h2 class="coupon-name">${coupon.attributes.name}</h2>
     <p class="coupon-code">${coupon.attributes.code}<p>
     <p class="coupon-value">Value: ${coupon.attributes.value} ${coupon.attributes.value_type} off<p>
-    <p class="coupon-activated">Activated: ${coupon.attributes.activated} <p>
+    </article>`
+  })
+}
+
+function getActiveMerchantCoupons(event){
+  let merchantId = event.target.dataset.merchantId 
+  console.log("Merchant ID:", merchantId)
+  fetchData(`merchants/${merchantId}/coupons?status=active`)
+  .then(couponData => {
+    console.log("Coupon data from fetch:", couponData)
+    allActiveCoupons = couponData.data
+    displayActiveMerchantCoupons(allActiveCoupons,event);
+  })
+}
+
+function displayMerchantCoupons(coupons,event) {
+  show([couponsView,activeCoupons]) 
+  hide([merchantsView, itemsView, addNewButton])
+  let merchantId = event.target.closest("article").id.split('-')[1]
+  showingText.innerText = `All coupons for Merchant #${merchantId}`
+  couponsView.innerHTML = ''
+  coupons.forEach(coupon => {
+    couponsView.innerHTML += 
+    `<article class="coupon" id="coupon-${coupon.id}">
+    <h2 class="coupon-name">${coupon.attributes.name}</h2>
+    <p class="coupon-code">${coupon.attributes.code}<p>
+    <p class="coupon-value">Value: ${coupon.attributes.value} ${coupon.attributes.value_type} off<p>
+    </article>`
+  })
+}
+
+function displayActiveMerchantCoupons(allActiveCoupons,event){
+  show([couponsView,backButton]) 
+  hide([merchantsView, itemsView, addNewButton,activeCoupons])
+  let merchantId = event.target.dataset.merchantId
+  showingText.innerText = `All active coupons for Merchant #${merchantId}`
+  couponsView.innerHTML = ''
+  allActiveCoupons.forEach(coupon => {
+    couponsView.innerHTML += 
+    `<article class="coupon" id="coupon-${coupon.id}">
+    <h2 class="coupon-name">${coupon.attributes.name}</h2>
+    <p class="coupon-code">${coupon.attributes.code}<p>
+    <p class="coupon-value">Value: ${coupon.attributes.value} ${coupon.attributes.value_type} off<p>
     </article>`
   })
 }
